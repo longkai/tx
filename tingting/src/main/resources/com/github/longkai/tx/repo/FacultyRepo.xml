@@ -1,0 +1,30 @@
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.longkai.tx.repo.FacultyRepo">
+	<cache />
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO faculty (id, name, `desc`) VALUES (null, #{name}, #{desc});
+	</insert>
+
+	<delete id="delete" parameterType="_int">
+		DELETE FROM faculty WHERE id = #{id};
+	</delete>
+
+	<update id="update">
+		UPDATE faculty SET name = #{name}, `desc` = #{desc} WHERE id = #{id};
+	</update>
+
+	<select id="find" parameterType="_long" resultType="faculty">
+		SELECT * FROM faculty WHERE id = #{id};
+	</select>
+
+	<select id="count" resultType="_int">
+		SELECT COUNT(1) FROM faculty;
+	</select>
+
+	<select id="faculties" resultType="faculty">
+		SELECT * from faculty;
+	</select>
+</mapper>
