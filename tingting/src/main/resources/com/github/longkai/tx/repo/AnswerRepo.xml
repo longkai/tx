@@ -1,0 +1,109 @@
+<!DOCTYPE mapper
+		PUBLIC "-//mybais.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.longkai.tx.repo.AnswerRepo">
+	<cache />
+
+	<resultMap id="answer" type="answer" autoMapping="true">
+		<id property="id" column="id" />
+		<association property="question" resultMap="question" />
+		<association property="student" resultMap="student" />
+		<association property="teacher" resultMap="teacher" />
+	</resultMap>
+
+	<resultMap id="question" type="question">
+		<id property="id" column="qid" />
+		<!--懒加载，只加载问题的id，没有必要把问题的所有属性加载进来-->
+	</resultMap>
+
+	<resultMap id="student" type="student">
+		<id property="id" column="sid" />
+		<!--懒加载，理由同上question-->
+	</resultMap>
+
+	<resultMap id="teacher" type="teacher">
+		<id property="id" column="tid" />
+		<!--懒加载-->
+	</resultMap>
+
+	<sql id="answer_columns">
+		A.id,
+		A.answer,
+		A.nice,
+		A.bad,
+		A.last_alter_date,
+		A.question_id as qid,
+		A.student_id as sid,
+		A.teacher_id as tid
+	</sql>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO answers (id, question_id, answer, student_id, teacher_id, nice, bad, last_alter_date)
+			VALUES (null, #{question.id}, #{answer},
+			        <choose>
+				        <when test="student == null">
+					        null,
+				        </when>
+				        <otherwise>
+					        #{student.id},
+				        </otherwise>
+			        </choose>
+					<choose>
+						<when test="teacher == null">
+							null,
+						</when>
+						<otherwise>
+							#{teacher.id},
+						</otherwise>
+					</choose>
+				0, 0, #{last_alter_date});
+	</insert>
+
+	<delete id="delete" parameterType="_long">
+		DELETE FROM answers WHERE id = #{id};
+	</delete>
+
+	<update id="update">
+		UPDATE answers SET answer = #{answer}, nice = #{nice}, bad = #{bad}, last_alter_date = #{last_alter_date} WHERE id = #{id};
+	</update>
+
+	<select id="find" parameterType="_long" resultMap="answer">
+		SELECT
+			<include refid="answer_columns" />
+		FROM
+			answers as A
+		WHERE
+			A.id = #{id};
+	</select>
+
+	<select id="answersByQuestion" resultMap="answer">
+		SELECT
+			<include refid="answer_columns" />
+		FROM
+			answers as A
+		WHERE
+			A.question_id = #{qid}
+			<if test="last > 0">
+				<![CDATA[AND A.id < last]]>
+			</if>
+		ORDER BY A.id DESC LIMIT #{count};
+	</select>
+
+	<select id="myAnswers" resultMap="answer">
+		SELECT
+			<include refid="answer_columns" />
+		FROM
+			answers as A
+		WHERE
+			<choose>
+				<when test="is_student == true">
+					A.student_id = #{id}
+				</when>
+				<otherwise>
+					A.teacher_id = #{id}
+				</otherwise>
+			</choose>
+		ORDER BY A.id DESC LIMIT #{offset}, #{count};
+	</select>
+
+</mapper>

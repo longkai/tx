@@ -23,6 +23,7 @@ public class Class implements Serializable {
 	private Faculty faculty;
 	private String extra;
 	private Teacher teacher;
+//	todo add semester here!
 
 	public long getId() {
 		return id;

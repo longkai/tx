@@ -1,0 +1,124 @@
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.longkai.tx.repo.MyCourseRepo">
+	<cache />
+
+	<resultMap id="my_course" type="my_course">
+		<result property="score" column="score" />
+		<association property="course" resultMap="course" />
+		<association property="student" resultMap="student" />
+		<association property="teacher" resultMap="teacher" />
+		<association property="semester" resultMap="semester" />
+	</resultMap>
+
+	<resultMap id="course" type="course">
+		<id property="id" column="cid" />
+		<result property="name" column="cname" />
+		<result property="credit" column="ccredit" />
+		<result property="desc" column="cdesc" />
+		<result property="extra" column="cextra" />
+		<association property="faculty" resultMap="faculty" />
+	</resultMap>
+
+	<resultMap id="teacher" type="teacher">
+		<id property="id" column="tid" />
+		<result property="password" column="tpassword" />
+		<result property="name" column="tname" />
+		<result property="contact" column="tcontact" />
+		<result property="about" column="tabout" />
+		<association property="faculty" resultMap="faculty" />
+	</resultMap>
+
+	<resultMap id="student" type="student">
+		<id property="id" column="sid" />
+		<result property="student_id" column="sstudent_id" />
+		<result property="password" column="spassword" />
+		<result property="name" column="sname" />
+		<result property="contact" column="scontact" />
+		<result property="is_admin" column="sis_admin" />
+		<association property="_class" resultMap="class" />
+	</resultMap>
+
+	<resultMap id="class" type="class">
+		<id property="id" column="class_id" />
+		<result property="extra" column="class_extra" />
+		<association property="faculty" resultMap="faculty" />
+		<association property="teacher" resultMap="teacher" />
+	</resultMap>
+
+	<resultMap id="faculty" type="faculty">
+		<id property="id" column="fid" />
+		<result property="name" column="fname" />
+		<result property="desc" column="fdesc" />
+	</resultMap>
+
+	<resultMap id="semester" type="semester">
+		<id property="id" column="semester_id" />
+		<result property="year_gap" column="semester_year_gap" />
+		<result property="desc" column="semester_desc" />
+	</resultMap>
+
+	<sql id="my_course_columns">
+		M.score,
+		M.course_id as cid,
+		M.teacher_id as tid,
+		M.student_id as sid,
+		M.semester_id as semester_id,
+		C.name as cname,
+		C.credit as ccredit,
+		C.desc as cdesc,
+		C.extra as cextra,
+		C.faculty_id as fid,
+		S.student_id as sstudent_id,
+		S.password as spassword,
+		S.name as sname,
+		S.contact as scontact,
+		S.is_admin as sis_admin,
+		S.class_id as class_id,
+		T.teacher_id as tteacher_id,
+		T.password as tpassword,
+		T.teacher_id as tteacher_id,
+		T.name as tname,
+		T.contact as tcontact,
+		T.about as tabout,
+		F.name as fname,
+		F.desc as fdesc,
+		S2.year_gap as semester_year_gap,
+		S2.desc as semester_desc,
+		C2.extra as class_extra
+	</sql>
+
+	<insert id="insert">
+		INSERT INTO my_courses (course_id, teacher_id, student_id, semester_id, score) VALUES (#{course.id}, #{teacher.id}, #{student.id}, #{semester.id}, null);
+	</insert>
+
+	<update id="update" parameterType="my_course">
+		UPDATE
+			my_courses
+		SET
+			semester_id = #{semester.id}, score = #{score}, teacher_id = #{teacher.id}
+		WHERE
+			student_id = #{student.id} AND course_id = #{course.id};
+	</update>
+
+	<select id="countThisSemester" resultType="_int">
+		SELECT COUNT(1) FROM my_courses WHERE student_id = #{sid} AND semester_id = #{semester_id};
+	</select>
+
+	<select id="myCoursesThisSemester" resultMap="my_course">
+		SELECT
+			<include refid="my_course_columns" />
+		FROM
+			my_courses as M
+		JOIN students as S ON M.student_id = S.id
+		JOIN teachers as T ON M.teacher_id = T.id
+		JOIN semesters as S2 ON M.semester_id = S2.id
+		JOIN courses as C ON M.course_id = C.id
+		JOIN classes as C2 ON S.class_id = C2.id
+		JOIN faculty as F ON C.faculty_id = F.id
+		WHERE
+			M.student_id = #{sid} AND M.semester_id = #{semester_id};
+	</select>
+
+</mapper>

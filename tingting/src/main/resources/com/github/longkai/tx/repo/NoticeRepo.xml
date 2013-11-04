@@ -1,0 +1,53 @@
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.longkai.tx.repo.NoticeRepo">
+	<cache />
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO notices (id, title, content, last_alter_date) VALUES (null, #{title}, #{content}, #{last_alter_date});
+	</insert>
+
+	<delete id="delete" parameterType="_long">
+		DELETE FROM notices WHERE id = #{id};
+	</delete>
+
+	<update id="update">
+		UPDATE notices SET title = #{title}, content = #{content}, last_alter_date = #{last_alter_date} WHERE id = #{id};
+	</update>
+
+	<select id="find" parameterType="_long" resultType="notice">
+		SELECT * FROM notices WHERE id = #{id};
+	</select>
+
+	<select id="count" resultType="_int">
+		SELECT COUNT(1) FROM notices;
+	</select>
+
+	<!--注意，这里我们并没有把内容给加载了-->
+	<select id="notices" resultType="notice">
+		SELECT
+			id, title, last_alter_date
+		FROM
+			notices
+			<if test="last > 0">
+				<![CDATA[WHERE id < #{last}]]>
+			</if>
+		LIMIT #{count};
+	</select>
+
+	<!--注意，这里我们并没有把内容给加载了-->
+	<select id="search" resultType="notice">
+		SELECT
+			id, title, last_alter_date
+		FROM
+			notices
+		WHERE
+			<if test="last > 0">
+				<![CDATA[id < last AND]]>
+			</if>
+			(title LIKE #{keywords} OR content LIKE #{keywords})
+		ORDER BY id DESC LIMIT #{count};
+	</select>
+
+</mapper>

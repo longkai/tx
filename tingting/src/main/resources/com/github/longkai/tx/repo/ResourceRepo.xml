@@ -1,0 +1,124 @@
+<!DOCTYPE mapper
+		PUBLIC "-//mybais.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.longkai.tx.repo.ResourceRepo">
+	<cache />
+
+	<resultMap id="resource" type="resource" autoMapping="true">
+		<id property="id" column="id" />
+		<association property="teacher" resultMap="teacher" />
+		<association property="course" resultMap="course" />
+	</resultMap>
+
+	<resultMap id="teacher" type="teacher">
+		<id property="id" column="tid" />
+		<result property="name" column="tname" />
+		<result property="teacher_id" column="tteacher_id" />
+		<result property="password" column="tpassword" />
+		<result property="contact" column="tcontact" />
+		<result property="about" column="tabout" />
+		<association property="faculty" resultMap="faculty" />
+	</resultMap>
+
+	<resultMap id="faculty" type="faculty">
+		<id property="id" column="fid" />
+		<result property="name" column="fname" />
+		<result property="desc" column="fdesc" />
+	</resultMap>
+
+	<resultMap id="course" type="course">
+		<id property="id" column="cid" />
+		<result property="name" column="cname" />
+		<result property="credit" column="ccredit" />
+		<result property="desc" column="cdesc" />
+		<result property="extra" column="cextra" />
+		<association property="faculty" resultMap="faculty" />
+	</resultMap>
+
+	<sql id="resource_columns">
+		R.id,
+		R.url,
+		R.name,
+		R.desc,
+		R.upload_date,
+		R.course_id as cid,
+		R.teacher_id as tid,
+		C.name as cname,
+		C.credit as ccredit,
+		C.desc as cdesc,
+		C.extra as cextra,
+		T.teacher_id as tteacher_id,
+		T.password as tpassword,
+		T.name as tname,
+		T.contact as tcontact,
+		T.about as tabout,
+		F.name as fname,
+		F.desc as fdesc
+	</sql>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO resources (id, name, url, `desc`, course_id, teacher_id, upload_date) VALUES (null, #{name}, #{url}, #{desc}, #{course.id}, #{teacher.id}, #{upload_date});
+	</insert>
+
+	<delete id="delete" parameterType="_long">
+		DELETE FROM resources WHERE id = #{id};
+	</delete>
+
+	<update id="update">
+		UPDATE resources SET name = #{name}, `desc` = #{desc}, course_id = #{course.id}, upload_date = #{upload_date} WHERE id = #{id};
+	</update>
+
+	<select id="find" parameterType="_long" resultMap="resource">
+		SELECT
+			<include refid="resource_columns" />
+		FROM
+			resources as R
+		JOIN teachers as T ON R.teacher_id = T.id
+		JOIN courses as C ON R.course_id = C.id
+		JOIN faculty as F ON T.faculty_id = F.id
+		WHERE
+			R.id = #{id};
+	</select>
+
+	<select id="count" resultType="_int">
+		SELECT COUNT(1) FROM resources;
+	</select>
+
+	<select id="countByCourse" resultType="_int">
+		SELECT COUNT(1) FROM resources WHERE course_id = #{cid};
+	</select>
+
+	<select id="countByTeacher" resultType="_int">
+		SELECT COUNT(1) FROM resources WHERE teacher_id = #{tid};
+	</select>
+
+	<select id="myResources" resultMap="resource">
+		SELECT
+			<include refid="resource_columns" />
+		FROM
+			resources as R
+		JOIN teachers as T ON R.teacher_id = T.id
+		JOIN courses as C ON R.course_id = C.id
+		JOIN faculty as F ON T.faculty_id = F.id
+		WHERE
+			R.teacher_id = #{tid}
+		ORDER BY R.id DESC LIMIT #{offset}, #{count};
+	</select>
+
+	<select id="resourcesFromCourse" resultMap="resource">
+		SELECT
+			<include refid="resource_columns" />
+		FROM
+			resources as R
+		JOIN teachers as T ON R.teacher_id = T.id
+		JOIN courses as C ON R.course_id = C.id
+		JOIN faculty as F ON T.faculty_id = F.id
+		WHERE
+			R.course_id = #{cid}
+		ORDER BY R.id DESC LIMIT #{offset}, #{count};
+	</select>
+
+	<select id="searchResources" resultType="resource">
+		SELECT * FROM resources WHERE name like #{keywords} ORDER BY id DESC LIMIT #{offset}, #{count};
+	</select>
+</mapper>

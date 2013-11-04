@@ -1,0 +1,68 @@
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.longkai.tx.repo.CourseRepo">
+	<cache />
+	
+	<resultMap id="course" type="course" autoMapping="true">
+		<id property="id" column="id" />
+		<association property="faculty" resultMap="faculty" />
+	</resultMap>
+
+	<resultMap id="faculty" type="faculty">
+		<id column="fid" property="id" />
+		<result column="fname" property="name" />
+		<result column="fdesc" property="desc" />
+	</resultMap>
+
+	<sql id="course_columns">
+		C.id,
+		C.name,
+		C.credit,
+		C.desc,
+		C.extra,
+		C.faculty_id as fid,
+		F.name as fname,
+		F.desc as fdesc
+	</sql>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO courses (id, name, credit, faculty_id, `desc`, extra) VALUES (null, #{name}, #{credit}, #{faculty.id}, #{desc}, #{extra});
+	</insert>
+
+	<delete id="delete" parameterType="_long">
+		DELETE FROM courses WHERE id = #{id};
+	</delete>
+
+	<update id="update">
+		UPDATE courses SET
+			name = #{name},
+			credit = #{credit},
+			faculty_id = #{faculty.id},
+			`desc` = #{desc},
+			extra = #{extra}
+		WHERE id = #{id};
+	</update>
+
+	<select id="find" parameterType="_long" resultMap="course">
+		SELECT
+			 <include refid="course_columns" />
+		FROM
+			courses as C JOIN faculty as F ON C.faculty_id = F.id
+		WHERE C.id = #{id};
+	</select>
+
+	<select id="count" resultType="_int">
+		SELECT COUNT(1) FROM courses;
+	</select>
+
+	<select id="coursesByFaculty" parameterType="_long" resultMap="course">
+	   	SELECT
+		    <include refid="course_columns" />
+		FROM
+			courses as C JOIN faculty as F ON C.faculty_id = F.id
+		WHERE
+			C.faculty_id = #{fid};
+	</select>
+
+</mapper>

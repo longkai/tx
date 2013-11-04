@@ -21,7 +21,7 @@ import java.util.Date;
 public class Notice implements Serializable {
 
 	private long id;
-	private String tilte;
+	private String title;
 	private String content;
 	private Date last_alter_date;
 
@@ -34,11 +34,11 @@ public class Notice implements Serializable {
 	}
 
 	public String getTilte() {
-		return tilte;
+		return title;
 	}
 
 	public void setTilte(String tilte) {
-		this.tilte = tilte;
+		this.title = tilte;
 	}
 
 	public String getContent() {
@@ -78,7 +78,7 @@ public class Notice implements Serializable {
 	public String toString() {
 		return "Notice{" +
 				"id=" + id +
-				", tilte='" + tilte + '\'' +
+				", title='" + title + '\'' +
 				", content='" + content + '\'' +
 				", last_alter_date=" + last_alter_date +
 				'}';

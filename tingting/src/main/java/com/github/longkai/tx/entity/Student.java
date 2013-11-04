@@ -24,7 +24,6 @@ public class Student implements Serializable {
 	private String password;
 	private String name;
 	private String contact;
-	private Faculty faculty;
 	/*所在班级*/
 	private Class _class;
 	/*是否是班干*/
@@ -71,14 +70,6 @@ public class Student implements Serializable {
 		this.contact = contact;
 	}
 
-	public Faculty getFaculty() {
-		return faculty;
-	}
-
-	public void setFaculty(Faculty faculty) {
-		this.faculty = faculty;
-	}
-
 	public Class get_class() {
 		return _class;
 	}
@@ -120,7 +111,6 @@ public class Student implements Serializable {
 				", password='" + password + '\'' +
 				", name='" + name + '\'' +
 				", contact='" + contact + '\'' +
-				", faculty=" + faculty +
 				", _class=" + _class +
 				", is_admin=" + is_admin +
 				'}';

@@ -1,0 +1,30 @@
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.longkai.tx.repo.SemesterRepo">
+	<cache />
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO semesters (id, year_gap, `desc`) VALUES (null, #{year_gap}, #{desc});
+	</insert>
+
+	<delete id="delete" parameterType="_long">
+		DELETE FROM semesters WHERE id = #{id};
+	</delete>
+
+	<update id="update">
+		UPDATE semesters SET year_gap = #{year_gap}, `desc` = #{desc} WHERE id = #{id};
+	</update>
+
+	<select id="find" parameterType="_long" resultType="semester">
+		SELECT * FROM semesters WHERE id = #{id};
+	</select>
+
+	<select id="semesters" resultType="semester">
+		SELECT * FROM semesters ORDER BY id DESC;
+	</select>
+
+	<select id="recentSemesters" parameterType="_int" resultType="semester">
+		SELECT * FROM semesters ORDER BY id DESC LIMIT #{count};
+	</select>
+</mapper>

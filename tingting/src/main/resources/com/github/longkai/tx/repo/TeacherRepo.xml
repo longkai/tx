@@ -1,0 +1,89 @@
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.longkai.tx.repo.TeacherRepo">
+	<cache />
+	
+	<resultMap id="teacher" type="teacher" autoMapping="true">
+		<id property="id" column="id" />
+		<association property="faculty" resultMap="faculty" />
+	</resultMap>
+
+	<resultMap id="faculty" type="faculty">
+		<id column="fid" property="id" />
+		<result column="fname" property="name" />
+		<result column="fdesc" property="desc" />
+	</resultMap>
+
+	<sql id="teacher_columns">
+		T.id,
+		T.teacher_id,
+		T.password,
+		T.name,
+		T.contact,
+		T.about,
+		T.faculty_id as fid,
+		F.name as fname,
+		F.desc as fdesc
+	</sql>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO teachers (id, teacher_id, password, name, contact, about, faculty_id) VALUES (null, #{teacher_id}, #{password}, #{name}, #{contact}, #{about}, #{faculty.id});
+	</insert>
+
+	<delete id="delete" parameterType="_long">
+		DELETE FROM teachers WHERE id = #{id};
+	</delete>
+
+	<update id="update">
+		UPDATE teachers SET
+			teacher_id = #{teacher_id},
+			password = #{password},
+			name = #{name},
+			contact = #{contact},
+			about = #{about},
+			faculty_id = #{faculty.id}
+		WHERE id = #{id};
+	</update>
+
+	<select id="find" parameterType="_long" resultMap="teacher">
+		SELECT
+			 <include refid="teacher_columns" />
+		FROM
+			teachers as T JOIN faculty as F ON T.faculty_id = F.id
+		WHERE
+			T.id = #{id};
+	</select>
+
+	<select id="count" resultType="_int">
+		SELECT COUNT(1) FROM teachers;
+	</select>
+
+	<select id="teachersByFaculty" parameterType="_long" resultMap="teacher">
+	   	SELECT
+		    <include refid="teacher_columns" />
+		FROM
+			teachers as T JOIN faculty as F ON T.faculty_id = F.id
+		WHERE
+			T.faculty_id = #{fid};
+	</select>
+
+	<select id="findByTeacherId" parameterType="string" resultMap="teacher">
+		SELECT
+			<include refid="teacher_columns" />
+		FROM
+			teachers as T JOIN faculty as F ON T.faculty_id = F.id
+		WHERE
+			T.teacher_id = #{tid};
+	</select>
+
+	<select id="findByTeacherIdAndPassword" resultMap="teacher">
+		SELECT
+			<include refid="teacher_columns" />
+		FROM
+			teachers as T JOIN faculty as F ON T.faculty_id = F.id
+		WHERE
+			T.teacher_id = #{tid} and T.password = #{password};
+	</select>
+
+</mapper>

@@ -1,0 +1,80 @@
+<!DOCTYPE mapper
+		PUBLIC "-//mybais.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.longkai.tx.repo.ClassRepo">
+	<cache />
+
+	<resultMap id="class" type="class" autoMapping="true">
+		<id property="id" column="id" />
+		<association property="faculty" resultMap="faculty" />
+		<association property="teacher" resultMap="teacher" />
+	</resultMap>
+
+	<resultMap id="teacher" type="teacher" autoMapping="true">
+		<id column="tid" property="id" />
+		<result column="tname" property="name" />
+		<association property="faculty" resultMap="faculty" />
+	</resultMap>
+
+	<resultMap id="faculty" type="faculty">
+		<id property="id" column="fid" />
+		<result property="name" column="fname" />
+		<result property="desc" column="fdesc" />
+	</resultMap>
+
+	<sql id="class_columns">
+		C.id,
+		C.extra,
+		C.faculty_id as fid,
+		C.teacher_id as tid,
+		F.name as fname,
+		F.desc as fdesc,
+		T.teacher_id,
+		T.password,
+		T.name as tname,
+		T.contact,
+		T.about
+	</sql>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO classes (id, faculty_id, extra, teacher_id) VALUES (null, #{faculty.id}, #{extra}, #{teacher.id});
+	</insert>
+
+	<delete id="delete" parameterType="_long">
+		DELETE FROM classes WHERE id = #{id};
+	</delete>
+
+	<update id="update">
+		UPDATE
+			classes
+		SET
+			faculty_id = #{faculty.id},
+			extra = #{extra},
+			teacher_id = #{teacher.id}
+		WHERE
+			id = #{id};
+	</update>
+
+	<select id="find" parameterType="_long" resultMap="class">
+		SELECT
+			<include refid="class_columns" />
+		FROM
+			classes as C JOIN teachers as T ON C.teacher_id = T.id JOIN faculty as F ON C.faculty_id = F.id
+		WHERE
+			C.id = #{id};
+	</select>
+
+	<select id="count" resultType="_int">
+		SELECT COUNT(1) FROM classes;
+	</select>
+
+	<select id="classesByFaculty" parameterType="_long" resultMap="class">
+		SELECT
+			<include refid="class_columns" />
+		FROM
+			classes as C JOIN teachers as T ON C.teacher_id = T.id JOIN faculty as F ON C.faculty_id = F.id
+		WHERE
+			C.faculty_id = #{fid};
+	</select>
+
+</mapper>

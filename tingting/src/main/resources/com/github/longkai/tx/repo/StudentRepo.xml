@@ -1,0 +1,120 @@
+<!DOCTYPE mapper
+		PUBLIC "-//mybis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.longkai.tx.repo.StudentRepo">
+	<cache />
+
+	<resultMap id="student" type="student" autoMapping="true">
+		<id property="id" column="id" />
+		<association property="_class" resultMap="class" />
+	</resultMap>
+
+	<resultMap id="class" type="class" autoMapping="true">
+		<id property="id" column="cid" />
+		<association property="faculty" resultMap="faculty" />
+		<!--这里，也可以不拿这个学生的班主任出来了，稍麻烦-->
+		<association property="teacher" resultMap="teacher" />
+	</resultMap>
+
+	<resultMap id="teacher" type="teacher" autoMapping="true">
+		<id property="id" column="tid" />
+		<result property="name" column="tname" />
+		<result property="password" column="tpassword" />
+		<result property="contact" column="tcontact" />
+		<association property="faculty" resultMap="faculty" />
+	</resultMap>
+
+	<resultMap id="faculty" type="faculty">
+		<id property="id" column="fid" />
+		<result property="name" column="fname" />
+		<result property="desc" column="fdesc" />
+	</resultMap>
+
+	<sql id="student_columns">
+		S.id,
+		S.student_id,
+		S.password,
+		S.name,
+		S.contact,
+		S.is_admin,
+		S.class_id as cid,
+		C.faculty_id as fid,
+		C.teacher_id as tid,
+		C.extra,
+		F.name as fname,
+		F.desc as fdesc,
+		T.teacher_id,
+		T.about,
+		T.name as tname,
+		T.password as tpassword,
+		T.contact as tcontact
+	</sql>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO students (id, student_id, password, name, contact, class_id, is_admin) VALUES (null, #{student_id}, #{password}, #{name}, #{contact}, #{class。id}, #{is_admin});
+	</insert>
+
+	<delete id="delete" parameterType="_long">
+		DELETE FROM students WHERE id = #{id};
+	</delete>
+
+	<update id="update">
+		UPDATE
+			students
+		SET
+			student_id = #{student_id},
+			password = #{password},
+			name = #{name},
+			student_id = #{student_id},
+			contact = #{contact},
+			class_id = #{class.id},
+			is_admin = #{is_admin}
+		WHERE
+			id = #{id};
+	</update>
+
+	<select id="find" parameterType="_long" resultMap="student">
+		SELECT
+			<include refid="student_columns" />
+		FROM
+			students as S JOIN classes as C ON S.class_id = C.id JOIN faculty as F ON C.faculty_id = F.id JOIN teachers as T ON C.teacher_id = T.id
+		WHERE
+			S.id = #{id};
+	</select>
+
+	<select id="count" resultType="_int">
+		SELECT COUNT(1) FROM students;
+	</select>
+
+	<select id="countByClass" parameterType="_long" resultType="_int">
+		SELECT COUNT(1) FROM students WHERE class_id = #{cid};
+	</select>
+
+	<select id="studentsByClass" parameterType="_long" resultMap="student">
+		SELECT
+			<include refid="student_columns" />
+		FROM
+			students as S JOIN classes as C ON S.class_id = C.id JOIN faculty as F ON C.faculty_id = F.id JOIN teachers as T ON C.teacher_id = T.id
+		WHERE
+			S.class_id = #{cid};
+	</select>
+
+	<select id="findByStudentId" parameterType="string" resultMap="student">
+		SELECT
+			<include refid="student_columns" />
+		FROM
+			students as S JOIN classes as C ON S.class_id = C.id JOIN faculty as F ON C.faculty_id = F.id JOIN teachers as T ON C.teacher_id = T.id
+		WHERE
+			S.student_id = #{sid};
+	</select>
+
+	<select id="findByStudentIdAndPassword" resultMap="student">
+		SELECT
+			<include refid="student_columns" />
+		FROM
+			students as S JOIN classes as C ON S.class_id = C.id JOIN faculty as F ON C.faculty_id = F.id JOIN teachers as T ON C.teacher_id = T.id
+		WHERE
+			S.student_id = #{sid} and S.password = #{password};
+	</select>
+
+</mapper>

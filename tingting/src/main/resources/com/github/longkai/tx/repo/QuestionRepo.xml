@@ -1,0 +1,147 @@
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.longkai.tx.repo.QuestionRepo">
+	<cache />
+
+	<resultMap id="question" type="question" autoMapping="true">
+		<id column="id" property="id" />
+		<association property="course" resultMap="course" />
+		<association property="consulter" resultMap="student" />
+	</resultMap>
+
+	<resultMap id="course" type="course">
+		<id property="id" column="cid" />
+		<result property="name" column="cname" />
+		<result property="credit" column="ccredit" />
+		<result property="desc" column="cdesc" />
+		<result property="extra" column="cextra" />
+		<association property="faculty" resultMap="faculty" />
+	</resultMap>
+
+	<resultMap id="student" type="student">
+		<id property="id" column="sid" />
+		<result property="student_id" column="sstudent_id" />
+		<result property="password" column="spassword" />
+		<result property="name" column="sname" />
+		<result property="contact" column="scontact" />
+		<result property="is_admin" column="sis_admin" />
+		<!--省略班级了，意义不是很大-->
+	</resultMap>
+
+	<resultMap id="faculty" type="faculty">
+		<id property="id" column="fid" />
+		<result property="name" column="fname" />
+		<result property="desc" column="fdesc" />
+	</resultMap>
+
+	<sql id="question_columns">
+		Q.id,
+		Q.title,
+		Q.content,
+		Q.last_alter_date,
+		Q.course_id as cid,
+		Q.consulter_id as sid,
+		S.student_id as sstudent_id,
+		S.password as spassword,
+		S.name as sname,
+		S.contact as scontact,
+		S.class_id as class_id,
+		S.is_admin as sis_admin,
+		C.name as cname,
+		C.credit as ccredit,
+		C.faculty_id as fid,
+		C.desc as cdesc,
+		C.extra as cextra,
+		F.name as fname,
+		F.desc as fdesc
+	</sql>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO questions (id, title, content, course_id, consulter_id, last_alter_date) VALUES (null, #{title}, #{content}, #{course_id}, #{consulter_id}, #{last_alter_date});
+	</insert>
+
+	<delete id="delete" parameterType="_long">
+		DELETE FROM questions WHERE id = #{id};
+	</delete>
+
+	<update id="update">
+		UPDATE
+			questions
+		SET
+			title = #{title},
+			content = #{content},
+			course_id = #{course.id},
+			consulter_id = #{consulter.id},
+			last_alter_date = #{last_alter_date}
+		WHERE
+			id = #{id};
+	</update>
+
+	<select id="find" parameterType="_long" resultMap="question">
+		SELECT
+			<include refid="question_columns" />
+		FROM
+			questions as Q
+		JOIN courses as C ON Q.course_id = C.id
+		JOIN students as S ON Q.consulter_id = S.id
+		JOIN faculty as F ON C.faculty_id = F.id
+		WHERE
+			Q.id = #{id};
+	</select>
+
+	<select id="count" resultType="_int">
+		SELECT COUNT(1) FROM questions;
+	</select>
+
+	<select id="myQuestions" resultMap="question">
+		SELECT
+			<include refid="question_columns" />
+		FROM
+			questions as Q
+		JOIN courses as C ON Q.course_id = C.id
+		JOIN students as S ON Q.consulter_id = S.id
+		JOIN faculty as F ON C.faculty_id = F.id
+		WHERE
+			Q.consulter_id = #{sid}
+			<choose>
+				<when test="last > 0">
+					<![CDATA[AND Q.id < #{last}]]>
+				</when>
+			</choose>
+		ORDER BY Q.id DESC LIMIT #{count};
+	</select>
+
+	<select id="questionsByCourse" resultMap="question">
+		SELECT
+			<include refid="question_columns" />
+		FROM
+			questions as Q
+		JOIN courses as C ON Q.course_id = C.id
+		JOIN students as S ON Q.consulter_id = S.id
+		JOIN faculty as F ON C.faculty_id = F.id
+		WHERE
+			Q.course_id = #{cid}
+			<if test="last > 0">
+				<![CDATA[AND Q.id < #{last}]]>
+			</if>
+		ORDER BY Q.id DESC lIMIT #{count};
+	</select>
+
+	<select id="searchQuestions" resultMap="question">
+		SELECT
+			<include refid="question_columns" />
+		FROM
+			questions as Q
+		JOIN courses as C ON Q.course_id = C.id
+		JOIN students as S ON Q.consulter_id = S.id
+		JOIN faculty as F ON C.faculty_id = F.id
+		WHERE
+			Q.title LIKE #{keywords} OR Q.content LIKE #{keywords}
+			<if test="last > 0">
+				<![CDATA[AND Q.id < #{last}]]>
+			</if>
+		ORDER BY Q.id DESC LIMIT #{count};
+	</select>
+
+</mapper>

@@ -5,21 +5,21 @@
  */
 package com.github.longkai.tx.repo;
 
-import com.github.longkai.tx.entity.Faculty;
+import com.github.longkai.tx.entity.Course;
 import org.springframework.stereotype.Repository;
 
 /**
- * 学院数据访问接口。
+ * 课程的数据访问接口。
  *
  * @User longkai
- * @Date 13-11-1
+ * @Date 13-11-2
  * @Mail im.longkai@gmail.com
  */
 @Repository
-public interface FacultyRepo extends BaseRepo<Faculty> {
+public interface CourseRepo extends BaseRepo<Course> {
 
 	int count();
 
-	Faculty[] faculties();
+	Course[] coursesByFaculty(long fid);
 
 }

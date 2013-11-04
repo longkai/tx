@@ -16,6 +16,7 @@
 
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
 		<property name="basePackage" value="com.github.longkai.tx.repo" />
-		<property name="markerInterface" value="com.github.longkai.tx.repo.BaseRepo" />
+		<property name="annotationClass" value="org.springframework.stereotype.Repository" />
+		<!--<property name="markerInterface" value="com.github.longkai.tx.repo.BaseRepo" />-->
 	</bean>
 </beans>
