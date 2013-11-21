@@ -10,7 +10,7 @@ subprojects {
 	repositories {
 		jcenter()
 		maven {
-			url 'file://d:/lib/repository/'
+			url 'file:/Volumes/bin/lib/repository/'
 		}
 	}
 

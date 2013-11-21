@@ -58,7 +58,7 @@
 	</sql>
 
 	<insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-		INSERT INTO questions (id, title, content, course_id, consulter_id, last_alter_date) VALUES (null, #{title}, #{content}, #{course_id}, #{consulter_id}, #{last_alter_date});
+		INSERT INTO questions (id, title, content, course_id, consulter_id, last_alter_date) VALUES (null, #{title}, #{content}, #{course.id}, #{consulter.id}, #{last_alter_date});
 	</insert>
 
 	<delete id="delete" parameterType="_long">

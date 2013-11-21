@@ -65,7 +65,7 @@
 	</delete>
 
 	<update id="update">
-		UPDATE resources SET name = #{name}, `desc` = #{desc}, course_id = #{course.id}, upload_date = #{upload_date} WHERE id = #{id};
+		UPDATE resources SET name = #{name}, `desc` = #{desc}, url = #{url}, course_id = #{course.id}, upload_date = #{upload_date} WHERE id = #{id};
 	</update>
 
 	<select id="find" parameterType="_long" resultMap="resource">

@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 /**
- * 作业的数据访问接口。
+ * 作业的访问接口现在。
  *
  * @User longkai
  * @Date 13-11-3

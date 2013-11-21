@@ -30,7 +30,6 @@ public class Student implements Serializable {
 	private boolean is_admin;
 
 	public long getId() {
-
 		return id;
 	}
 

@@ -25,8 +25,8 @@ public interface MyCourseRepo {
 	/**只能修改学期，授课教师与成绩*/
 	int update(MyCourse myCourse);
 
-	int countThisSemester(@Param("semester_id") int semesterId, @Param("sid") int studentId);
+	int countThisSemester(@Param("semester_id") long semesterId, @Param("sid") long studentId);
 
-	MyCourse[] myCoursesThisSemester(@Param("semester_id") int semesterId, @Param("sid") int studentId);
+	MyCourse[] myCoursesThisSemester(@Param("semester_id") long semesterId, @Param("sid") long studentId);
 
 }

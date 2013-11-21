@@ -24,22 +24,24 @@ public interface QuestionRepo extends BaseRepo<Question> {
 	/**
 	 * 抓取我的问题。
 	 *
+	 *
 	 * @param studentId 我的id
 	 * @param lastId 加载更多的时候用，负数表示刷新
 	 * @param count 多少条
 	 * @return my questions
 	 */
-	Question[] myQuestions(@Param("sid") int studentId, @Param("last") long lastId, @Param("count") int count);
+	Question[] myQuestions(@Param("sid") long studentId, @Param("last") long lastId, @Param("count") int count);
 
 	/**
 	 * 抓取某个课程下的疑问。
+	 *
 	 *
 	 * @param courseId 课程id
 	 * @param last 加载更多疑问时使用，负数表示刷新
 	 * @param count 多少条
 	 * @return questions
 	 */
-	Question[] questionsByCourse(@Param("cid") int courseId, @Param("last") long last, @Param("count") int count);
+	Question[] questionsByCourse(@Param("cid") long courseId, @Param("last") long last, @Param("count") int count);
 
 	/**
 	 * 查询相关的问题。

@@ -51,7 +51,7 @@
 	</sql>
 
 	<insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-		INSERT INTO students (id, student_id, password, name, contact, class_id, is_admin) VALUES (null, #{student_id}, #{password}, #{name}, #{contact}, #{class。id}, #{is_admin});
+		INSERT INTO students (id, student_id, password, name, contact, class_id, is_admin) VALUES (null, #{student_id}, #{password}, #{name}, #{contact}, #{_class.id}, #{is_admin});
 	</insert>
 
 	<delete id="delete" parameterType="_long">
@@ -62,12 +62,11 @@
 		UPDATE
 			students
 		SET
-			student_id = #{student_id},
 			password = #{password},
 			name = #{name},
 			student_id = #{student_id},
 			contact = #{contact},
-			class_id = #{class.id},
+			class_id = #{_class.id},
 			is_admin = #{is_admin}
 		WHERE
 			id = #{id};
